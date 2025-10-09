@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบบุคลิกภาพ DISC | ค้นพบสไตล์ของคุณ</title>
+    <meta name="description" content="ทำแบบทดสอบบุคลิกภาพ DISC เพื่อค้นหาและทำความเข้าใจเกี่ยวกับอุปนิสัยและสไตล์การทำงานของคุณ ทั้งในด้านความเป็นผู้นำ การมีอิทธิพล ความสม่ำเสมอ และความละเอียดรอบคอบ">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap');
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            color: #1f2937;
+        }
+        /* Custom radio button styling with hover effect */
+        .custom-radio-label {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .custom-radio-label:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+        input[type="radio"]:checked + .custom-radio-label {
+            background-color: #dbeafe; /* Light blue */
+            border-color: #3b82f6; /* Blue border */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        .result-box {
+            animation: fadeIn 0.8s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-10 border border-gray-200">
+
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-800 mb-2">แบบวัดอุปนิสัย แบบ DISC</h1>
+            <p class="text-lg text-gray-600 border-b pb-4">ค้นพบสไตล์บุคลิกภาพของคุณ</p>
+        </header>
+
+        <div id="instructions-screen">
+            <h2 class="text-xl font-bold mb-4 text-blue-700">คำชี้แจง</h2>
+            <div class="space-y-4 text-gray-700 leading-relaxed bg-gray-50 p-6 rounded-lg border">
+                <p>แบบวัดฉบับนี้มีคำถามทั้งหมด 20 ข้อ แต่ละข้อจะมีตัวเลือก 4 ตัวเลือก</p>
+                <p>โปรดทำเครื่องหมายเลือก **เพียง 1 ตัวเลือก** ที่ตรงกับความเป็นจริงของท่านมากที่สุด</p>
+            </div>
+            <button id="start-button" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+                เริ่มทำแบบวัด
+            </button>
+
+            <div class="mt-10 flex justify-center">
+                <img src="/Material/psychology-seeklogo.png" alt="Psychology Seek Logo" class="w-40">
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <div id="progress-container" class="sticky top-0 z-10 bg-white py-4 border-b mb-6">
+                <div class="flex justify-between mb-1">
+                    <span class="text-base font-medium text-blue-700">ความคืบหน้า</span>
+                    <span id="progress-text" class="text-sm font-medium text-blue-700">ข้อ 0 / 20</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <form id="disc-form" class="space-y-12">
+                </form>
+
+            <div id="message-box" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg mt-8" role="alert">
+                <p class="font-bold">กรุณาตอบทุกข้อ</p>
+                <p class="text-sm">คุณยังไม่ได้ตอบคำถามครบทั้ง 20 ข้อ</p>
+            </div>
+
+            <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">
+                ประมวลผลลัพธ์
+            </button>
+        </div>
+
+        <div id="results-screen" class="hidden">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center text-blue-700 mb-8">ผลการประเมินบุคลิกภาพ DISC ของคุณ</h2>
+
+            <div id="score-summary" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                </div>
+
+            <div id="main-result" class="result-box p-6 sm:p-8 rounded-xl shadow-2xl bg-white">
+                <h3 class="text-2xl font-extrabold mb-4 text-center">บุคลิกภาพที่โดดเด่นที่สุด</h3>
+                <div id="dominant-type" class="text-center">
+                    </div>
+            </div>
+
+            <button id="restart-button" class="mt-8 w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+                ทำแบบวัดใหม่อีกครั้ง
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data Definitions ---
+        const QUESTIONS = [
+            { id: 1, statements: [{ type: 'D', text: 'ฉันชอบเป็นคนตัดสินใจ' }, { type: 'I', text: 'ฉันขี้เล่น' }, { type: 'S', text: 'ฉันห่วงใยผู้อื่นเสมอ' }, { type: 'C', text: 'ฉันเป็นคนมีระเบียบ' }] },
+            { id: 2, statements: [{ type: 'D', text: 'ฉันไม่ชอบให้ใครสั่ง' }, { type: 'I', text: 'ฉันมีความสุขเมื่อเป็นจุดสนใจ' }, { type: 'S', text: 'ฉันมีความอดทน' }, { type: 'C', text: 'ฉันชอบให้สั่งงานเป็นลายลักษณ์อักษร' }] },
+            { id: 3, statements: [{ type: 'D', text: 'ฉันเป็นคนไม่ท้อแท้ง่าย' }, { type: 'I', text: 'ฉันชอบเรียกเสียงหัวเราะจากคนอื่น' }, { type: 'S', text: 'ฉันไม่ชอบการขัดแย้ง' }, { type: 'C', text: 'ฉันใส่ใจในรายละเอียดของงาน' }] },
+            { id: 4, statements: [{ type: 'D', text: 'ฉันแก้ไขปัญหาได้เร็ว' }, { type: 'I', text: 'ฉันมีเพื่อนมาก' }, { type: 'S', text: 'ฉันทำเพื่อผู้อื่น' }, { type: 'C', text: 'ฉันทำงานเดิมๆ ได้' }] },
+            { id: 5, statements: [{ type: 'D', text: 'ฉันชอบงานท้าทาย' }, { type: 'I', text: 'ฉันมีความคิดสร้างสรรค์' }, { type: 'S', text: 'ฉันไม่โกรธง่าย' }, { type: 'C', text: 'ฉันมีมาตรฐานสูง' }] },
+            { id: 6, statements: [{ type: 'D', text: 'ฉันต้องการชนะ' }, { type: 'I', text: 'ฉันชอบทำงานนอกสถานที่' }, { type: 'S', text: 'ฉันชอบสนับสนุนผู้อื่น' }, { type: 'C', 'text': 'ฉันมีมารยาทดี' }] },
+            { id: 7, statements: [{ type: 'D', text: 'ฉันกล้าโต้แย้งถ้าไม่เห็นด้วย' }, { type: 'I', text: 'ฉันชอบให้คนชมฉัน' }, { type: 'S', text: 'ฉันไม่อยากทำให้คนอื่นเสียใจ' }, { type: 'C', text: 'ฉันละเอียดและงานที่ทำต้องเนี้ยบ' }] },
+            { id: 8, statements: [{ type: 'D', text: 'ฉันทำงานแบบทุ่มเทเต็มที่' }, { type: 'I', text: 'ฉันชอบเรียกเสียงหัวเราะจากคนอื่น' }, { type: 'S', text: 'ฉันชอบความสงบ' }, { type: 'C', text: 'ฉันมีวินัย ควบคุมตนเองได้ดี' }] },
+            { id: 9, statements: [{ type: 'D', text: 'ฉันกล้าที่จะทวงสิทธิ์ของฉัน' }, { type: 'I', text: 'ฉันเป็นคนมีความสุขและร่าเริง' }, { type: 'S', text: 'ฉันหลีกเลี่ยงการเกิดปัญหา' }, { type: 'C', text: 'ฉันไม่ชอบขัดแย้ง' }] },
+            { id: 10, statements: [{ type: 'D', text: 'ฉันกล้าหาญ' }, { type: 'I', text: 'ฉันชอบพบปะผู้คน' }, { type: 'S', text: 'ฉันซื่อสัตย์' }, { type: 'C', text: 'ฉันทำตามกฎ' }] },
+            { id: 11, statements: [{ type: 'D', text: 'ฉันตรงไปตรงมา' }, { type: 'I', text: 'ฉันสนใจเรื่องราวคนอื่น' }, { type: 'S', text: 'ฉันชอบฟังมากกว่าพูด' }, { type: 'C', text: 'ฉันทำทุกอย่างด้วยความระมัดระวัง' }] },
+            { id: 12, statements: [{ type: 'D', text: 'ฉันชอบแข่งขัน' }, { type: 'I', text: 'ฉันชอบอยู่กับเพื่อน' }, { type: 'S', text: 'ฉันไม่ชอบการเปลี่ยนแปลง' }, { type: 'C', text: 'ฉันชอบวางแผนเป็นขั้นเป็นตอน' }] },
+            { id: 13, statements: [{ type: 'D', text: 'ฉันรักอิสระ' }, { type: 'I', text: 'ฉันชอบความสนุก' }, { type: 'S', text: 'ฉันปฏิบัติตามคำสั่ง' }, { type: 'C', text: 'ฉันชอบกฎเกณฑ์' }] },
+            { id: 14, statements: [{ type: 'D', text: 'ฉันใฝ่หาความสำเร็จ' }, { type: 'I', text: 'ฉันคุยกับคนได้ง่าย' }, { type: 'S', text: 'ฉันยอมตามความเห็นผู้อื่น' }, { type: 'C', text: 'ฉันเป็นคนไม่รีบเร่ง' }] },
+            { id: 15, statements: [{ type: 'D', text: 'ฉันชอบเป็นผู้นำ' }, { type: 'I', text: 'ฉันสดใสร่าเริง' }, { type: 'S', text: 'ฉันใจเย็น' }, { type: 'C', text: 'ฉันชอบงานที่ชัดเจน' }] },
+            { id: 16, statements: [{ type: 'D', text: 'ฉันชอบบอกคนอื่นให้ทำอะไร' }, { type: 'I', text: 'ฉันเป็นคนทันสมัย' }, { type: 'S', text: 'ฉันใจดี' }, { type: 'C', text: 'ฉันตกใจง่าย' }] },
+            { id: 17, statements: [{ type: 'D', text: 'ฉันมุ่งมั่น' }, { type: 'I', text: 'ฉันชอบทำอะไรใหม่ๆ เป็นคนแรก' }, { type: 'S', text: 'ฉันสุขุม' }, { type: 'C', text: 'ฉันมองโลกในแง่ดี' }] },
+            { id: 18, statements: [{ type: 'D', text: 'ฉันเป็นคนพูดตรงๆ' }, { type: 'I', text: 'ฉันชอบสิ่งที่ไม่เหมือนใคร' }, { type: 'S', text: 'ฉันเข้าใจความรู้สึกของผู้อื่น' }, { type: 'C', text: 'ฉันชอบทำงานให้ถูกต้อง' }] },
+            { id: 19, statements: [{ type: 'D', text: 'ฉันกล้าเสี่ยง' }, { type: 'I', text: 'ฉันชอบช่วยเหลือ' }, { type: 'S', text: 'ฉันรับฟังอย่างใจเย็น' }, { type: 'C', text: 'ฉันละเอียดพิถีพิถัน' }] },
+            { id: 20, statements: [{ type: 'D', text: 'ฉันชอบงานที่ไม่น่าเบื่อ' }, { type: 'I', text: 'ฉันสนุกสนาน' }, { type: 'S', text: 'ฉันวางตัวเหมาะสมกับกาลเทศะ' }, { type: 'C', text: 'ฉันจริงใจ' }] }
+        ];
+
+        const resultDescriptions = {
+            D: {
+                title: "D - Dominance (ความเป็นผู้นำ)",
+                description: "คุณเป็นคนมุ่งมั่น ตรงไปตรงมา และเด็ดขาด ชอบความท้าทายและความสำเร็จ ต้องการควบคุมและเป็นผู้นำในการตัดสินใจ มักจะแก้ไขปัญหาได้อย่างรวดเร็วและไม่กลัวที่จะโต้แย้งเมื่อไม่เห็นด้วย",
+                colorClasses: { text: "text-red-600", bg: "bg-red-100", ring: "ring-red-400", border: "border-red-600" }
+            },
+            I: {
+                title: "I - Influence (การมีอิทธิพล)",
+                description: "คุณเป็นคนสดใส ร่าเริง ชอบเข้าสังคม และมีเสน่ห์ ชอบสร้างความสนุกสนานและเป็นที่สนใจ มีเพื่อนมากและมีความคิดสร้างสรรค์สูง มักจะกระตือรือร้นและมองโลกในแง่ดี",
+                colorClasses: { text: "text-yellow-600", bg: "bg-yellow-100", ring: "ring-yellow-400", border: "border-yellow-600" }
+            },
+            S: {
+                title: "S - Steadiness (ความสม่ำเสมอ)",
+                description: "คุณเป็นคนใจเย็น มีความอดทน และเห็นอกเห็นใจผู้อื่น ชอบความสงบและความมั่นคง ไม่ชอบความขัดแย้ง มักจะเป็นผู้ฟังที่ดีและพร้อมที่จะสนับสนุนผู้อื่น มีความซื่อสัตย์และวางตัวเหมาะสม",
+                colorClasses: { text: "text-green-600", bg: "bg-green-100", ring: "ring-green-400", border: "border-green-600" }
+            },
+            C: {
+                title: "C - Conscientiousness (ความละเอียดรอบคอบ)",
+                description: "คุณเป็นคนมีระเบียบวินัย ใส่ใจในรายละเอียด และมีมาตรฐานสูง ชอบทำงานที่ต้องใช้ความแม่นยำและการวางแผนเป็นขั้นเป็นตอน ทำตามกฎเกณฑ์และชอบงานที่ชัดเจน งานที่ทำต้องเนี้ยบและถูกต้องเสมอ",
+                colorClasses: { text: "text-blue-600", bg: "bg-blue-100", ring: "ring-blue-400", border: "border-blue-600" }
+            }
+        };
+
+        // --- DOM Elements ---
+        const appContainer = document.getElementById('app');
+        const instructionsScreen = document.getElementById('instructions-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const startButton = document.getElementById('start-button');
+        const calculateButton = document.getElementById('calculate-button');
+        const restartButton = document.getElementById('restart-button');
+        const discForm = document.getElementById('disc-form');
+        const messageBox = document.getElementById('message-box');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+
+        // --- Helper Functions ---
+
+        function renderQuestions() {
+            discForm.innerHTML = QUESTIONS.map(q => {
+                // This line shuffles the 4 choices for each question randomly
+                const shuffledStatements = [...q.statements].sort(() => Math.random() - 0.5);
+
+                const statementHtml = shuffledStatements.map((s, index) => `
+                    <div class="flex items-center">
+                        <input type="radio" id="q${q.id}-${index}" name="q${q.id}" value="${s.type}" class="hidden" required>
+                        <label for="q${q.id}-${index}" class="custom-radio-label w-full text-base">
+                            ${s.text}
+                        </label>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="question-block border-b pb-8">
+                        <p class="text-xl font-semibold mb-4 text-gray-800">คำถามข้อที่ ${q.id}: เลือกคำตอบที่ตรงกับคุณที่สุด</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${statementHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateScores() {
+            const scores = { D: 0, I: 0, S: 0, C: 0 };
+            const formData = new FormData(discForm);
+            let answeredCount = 0;
+
+            for (const [name, value] of formData.entries()) {
+                if (name.startsWith('q')) {
+                    scores[value]++;
+                    answeredCount++;
+                }
+            }
+            return { scores, answeredCount };
+        }
+
+        function calculateResults() {
+            const { scores, answeredCount } = calculateScores();
+
+            if (answeredCount < QUESTIONS.length) {
+                messageBox.classList.remove('hidden');
+                return;
+            }
+
+            calculateButton.textContent = 'กำลังประมวลผล...';
+            calculateButton.disabled = true;
+
+            messageBox.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            resultsScreen.scrollIntoView({ behavior: 'smooth' });
+
+            const scoreArray = Object.entries(scores);
+            scoreArray.sort((a, b) => b[1] - a[1]);
+            const highestScore = scoreArray[0][1];
+            const dominantTypes = scoreArray.filter(([type, score]) => score === highestScore).map(([type]) => type);
+
+            renderScoreSummary(scores);
+            renderDominantType(dominantTypes, highestScore);
+        }
+
+        function renderScoreSummary(scores) {
+            const summaryDiv = document.getElementById('score-summary');
+            summaryDiv.innerHTML = Object.entries(scores).map(([type, score]) => {
+                const desc = resultDescriptions[type];
+                return `
+                    <div class="text-center p-4 rounded-xl shadow-lg ${desc.colorClasses.bg} ring-2 ${desc.colorClasses.ring}">
+                        <p class="text-3xl font-extrabold ${desc.colorClasses.text}">${type}</p>
+                        <p class="text-xl font-bold text-gray-800">${score} / ${QUESTIONS.length}</p>
+                        <p class="text-sm text-gray-600">${desc.title.split(' - ')[1]}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDominantType(dominantTypes, highestScore) {
+            const resultDiv = document.getElementById('dominant-type');
+            const mainResultBox = document.getElementById('main-result');
+            let html = '';
+
+            if (dominantTypes.length === 1) {
+                const type = dominantTypes[0];
+                const desc = resultDescriptions[type];
+                html = `
+                    <div class="my-6">
+                        <p class="text-5xl font-extrabold ${desc.colorClasses.text}">${type}</p>
+                        <p class="text-3xl font-bold text-gray-800 mt-2">${desc.title}</p>
+                    </div>
+                    <p class="text-xl text-gray-700 leading-loose">${desc.description}</p>
+                    <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุด ${highestScore} คะแนน</p>
+                `;
+                 mainResultBox.className = `result-box border-4 ring-4 ring-offset-4 ${desc.colorClasses.ring} ${desc.colorClasses.border} p-6 sm:p-8 rounded-xl shadow-2xl bg-white`;
+            } else {
+                const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t} (${resultDescriptions[t].title.split(' - ')[1]})</span>`).join(' และ ');
+                const descriptions = dominantTypes.map(t => resultDescriptions[t].description).join(' ');
+
+                html = `
+                    <div class="my-6">
+                        <p class="text-3xl font-extrabold text-gray-900">บุคลิกภาพผสม</p>
+                        <p class="text-2xl font-bold text-gray-800 mt-2">สไตล์ของคุณมีความโดดเด่นในด้าน ${titles}</p>
+                    </div>
+                    <p class="text-xl text-gray-700 leading-loose">บุคลิกภาพของคุณมีความยืดหยุ่นและมีลักษณะเด่นจากหลายด้านผสมกัน: ${descriptions}</p>
+                    <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
+                `;
+                mainResultBox.className = 'result-box border-4 ring-4 ring-offset-4 ring-gray-400 border-gray-500 p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
+            }
+            resultDiv.innerHTML = html;
+        }
+
+        function resetApp() {
+            // Re-render questions to scramble choices for the new session.
+            renderQuestions();
+            updateProgress(0);
+            instructionsScreen.classList.remove('hidden');
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            calculateButton.textContent = 'ประมวลผลลัพธ์';
+            calculateButton.disabled = true; // Re-disable the button
+            appContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function updateProgress(answeredCount) {
+            const percentage = (answeredCount / QUESTIONS.length) * 100;
+            progressBar.style.width = `${percentage}%`;
+            progressText.textContent = `ข้อ ${answeredCount} / ${QUESTIONS.length}`;
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener('click', () => {
+            instructionsScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            discForm.querySelector('input[type="radio"]').focus();
+        });
+
+        calculateButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            calculateResults();
+        });
+
+        restartButton.addEventListener('click', () => {
+            if (confirm('คุณต้องการทำแบบทดสอบใหม่อีกครั้งหรือไม่? ผลลัพธ์ปัจจุบันจะถูกลบ')) {
+                resetApp();
+            }
+        });
+
+        discForm.addEventListener('change', () => {
+            const answeredCount = Array.from(discForm.elements).filter(el => el.checked).length;
+            calculateButton.disabled = answeredCount !== QUESTIONS.length;
+            updateProgress(answeredCount);
+            if (answeredCount === QUESTIONS.length) {
+                messageBox.classList.add('hidden');
+            }
+        });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestions();
+            calculateButton.disabled = true;
+        });
+
+    </script>
+</body>
+</html>
