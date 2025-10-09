@@ -16,7 +16,15 @@
             font-family: 'Noto Sans Thai', 'Inter', sans-serif;
             background-color: #f7f9fb;
             color: #1f2937;
+            transition: background-color 0.5s ease, background-image 0.5s ease; /* For smooth color change */
         }
+        /* Custom CSS classes for OKLCH background colors */
+        .bg-custom-d { background-color: oklch(71.2% 0.194 13.428); }
+        .bg-custom-i { background-color: oklch(87.9% 0.169 91.605); }
+        .bg-custom-s { background-color: oklch(87.1% 0.15 154.449); }
+        .bg-custom-c { background-color: oklch(70.7% 0.165 254.624); }
+        .bg-custom-neutral { background-color: oklch(95% 0 0); } /* A light gray for mixed results */
+        
         /* Custom radio button styling with hover effect */
         .custom-radio-label {
             display: block;
@@ -61,6 +69,10 @@
             <div class="space-y-4 text-gray-700 leading-relaxed bg-gray-50 p-6 rounded-lg border">
                 <p>แบบวัดฉบับนี้มีคำถามทั้งหมด 20 ข้อ แต่ละข้อจะมีตัวเลือก 4 ตัวเลือก</p>
                 <p>โปรดเลือก **เพียง 1 ตัวเลือก** ที่ตรงกับความเป็นจริงของท่านมากที่สุด</p>
+            </div>
+            
+            <div class="mt-6 text-center text-sm text-gray-500 bg-gray-100 p-3 rounded-md">
+                <p><strong>Disclaimer:</strong> แบบทดสอบนี้ ไม่มีการเก็บบันทึกผลการทดสอบ</p>
             </div>
             <button id="start-button" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
                 เริ่มทำแบบวัด
@@ -107,6 +119,9 @@
                     </div>
             </div>
 
+            <div class="mt-8 text-center text-sm text-gray-600">
+                <p><strong>Disclaimer:</strong> ผลการประเมินนี้เป็นเพียงแนวทางในการสำรวจตัวเองเท่านั้น</p>
+            </div>
             <button id="restart-button" class="mt-8 w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
                 ทำแบบวัดใหม่อีกครั้ง
             </button>
@@ -138,26 +153,31 @@
             { id: 20, statements: [{ type: 'D', text: 'ฉันชอบงานที่ไม่น่าเบื่อ' }, { type: 'I', text: 'ฉันสนุกสนาน' }, { type: 'S', text: 'ฉันวางตัวเหมาะสมกับกาลเทศะ' }, { type: 'C', text: 'ฉันจริงใจ' }] }
         ];
 
+        // --- MODIFIED: Added raw colorValue for creating gradients ---
         const resultDescriptions = {
             D: {
                 title: "D - Dominance (ความเป็นผู้นำ)",
                 description: "คุณเป็นคนมุ่งมั่น ตรงไปตรงมา และเด็ดขาด ชอบความท้าทายและความสำเร็จ ต้องการควบคุมและเป็นผู้นำในการตัดสินใจ มักจะแก้ไขปัญหาได้อย่างรวดเร็วและไม่กลัวที่จะโต้แย้งเมื่อไม่เห็นด้วย",
-                colorClasses: { text: "text-red-600", bg: "bg-red-100", ring: "ring-red-400", border: "border-red-600" }
+                colorClasses: { text: "text-red-600", bg: "bg-red-100", ring: "ring-red-400", border: "border-red-600", pageBg: "bg-custom-d" },
+                colorValue: "oklch(71.2% 0.194 13.428)"
             },
             I: {
                 title: "I - Influence (การมีอิทธิพล)",
                 description: "คุณเป็นคนสดใส ร่าเริง ชอบเข้าสังคม และมีเสน่ห์ ชอบสร้างความสนุกสนานและเป็นที่สนใจ มีเพื่อนมากและมีความคิดสร้างสรรค์สูง มักจะกระตือรือร้นและมองโลกในแง่ดี",
-                colorClasses: { text: "text-yellow-600", bg: "bg-yellow-100", ring: "ring-yellow-400", border: "border-yellow-600" }
+                colorClasses: { text: "text-yellow-600", bg: "bg-yellow-100", ring: "ring-yellow-400", border: "border-yellow-600", pageBg: "bg-custom-i" },
+                colorValue: "oklch(87.9% 0.169 91.605)"
             },
             S: {
                 title: "S - Steadiness (ความสม่ำเสมอ)",
                 description: "คุณเป็นคนใจเย็น มีความอดทน และเห็นอกเห็นใจผู้อื่น ชอบความสงบและความมั่นคง ไม่ชอบความขัดแย้ง มักจะเป็นผู้ฟังที่ดีและพร้อมที่จะสนับสนุนผู้อื่น มีความซื่อสัตย์และวางตัวเหมาะสม",
-                colorClasses: { text: "text-green-600", bg: "bg-green-100", ring: "ring-green-400", border: "border-green-600" }
+                colorClasses: { text: "text-green-600", bg: "bg-green-100", ring: "ring-green-400", border: "border-green-600", pageBg: "bg-custom-s" },
+                colorValue: "oklch(87.1% 0.15 154.449)"
             },
             C: {
                 title: "C - Conscientiousness (ความละเอียดรอบคอบ)",
                 description: "คุณเป็นคนมีระเบียบวินัย ใส่ใจในรายละเอียด และมีมาตรฐานสูง ชอบทำงานที่ต้องใช้ความแม่นยำและการวางแผนเป็นขั้นเป็นตอน ทำตามกฎเกณฑ์และชอบงานที่ชัดเจน งานที่ทำต้องเนี้ยบและถูกต้องเสมอ",
-                colorClasses: { text: "text-blue-600", bg: "bg-blue-100", ring: "ring-blue-400", border: "border-blue-600" }
+                colorClasses: { text: "text-blue-600", bg: "bg-blue-100", ring: "ring-blue-400", border: "border-blue-600", pageBg: "bg-custom-c" },
+                colorValue: "oklch(70.7% 0.165 254.624)"
             }
         };
 
@@ -179,9 +199,7 @@
 
         function renderQuestions() {
             discForm.innerHTML = QUESTIONS.map(q => {
-                // This line shuffles the 4 choices for each question randomly
                 const shuffledStatements = [...q.statements].sort(() => Math.random() - 0.5);
-
                 const statementHtml = shuffledStatements.map((s, index) => `
                     <div class="flex items-center">
                         <input type="radio" id="q${q.id}-${index}" name="q${q.id}" value="${s.type}" class="hidden" required>
@@ -190,7 +208,6 @@
                         </label>
                     </div>
                 `).join('');
-
                 return `
                     <div class="question-block border-b pb-8">
                         <p class="text-xl font-semibold mb-4 text-gray-800">คำถามข้อที่ ${q.id}:</p>
@@ -206,7 +223,6 @@
             const scores = { D: 0, I: 0, S: 0, C: 0 };
             const formData = new FormData(discForm);
             let answeredCount = 0;
-
             for (const [name, value] of formData.entries()) {
                 if (name.startsWith('q')) {
                     scores[value]++;
@@ -218,26 +234,20 @@
 
         function calculateResults() {
             const { scores, answeredCount } = calculateScores();
-
             if (answeredCount < QUESTIONS.length) {
                 messageBox.classList.remove('hidden');
                 return;
             }
-
             calculateButton.textContent = 'กำลังประมวลผล...';
             calculateButton.disabled = true;
-
             messageBox.classList.add('hidden');
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
-
             resultsScreen.scrollIntoView({ behavior: 'smooth' });
-
             const scoreArray = Object.entries(scores);
             scoreArray.sort((a, b) => b[1] - a[1]);
             const highestScore = scoreArray[0][1];
             const dominantTypes = scoreArray.filter(([type, score]) => score === highestScore).map(([type]) => type);
-
             renderScoreSummary(scores);
             renderDominantType(dominantTypes, highestScore);
         }
@@ -256,14 +266,25 @@
             }).join('');
         }
 
+        // --- MODIFIED: Function now handles gradients for 2-way ties ---
         function renderDominantType(dominantTypes, highestScore) {
             const resultDiv = document.getElementById('dominant-type');
             const mainResultBox = document.getElementById('main-result');
+            const body = document.body;
             let html = '';
+            
+            // --- Reset all possible backgrounds first ---
+            const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
+            body.classList.remove(...allPageBgClasses);
+            body.style.backgroundImage = ''; // Clear any previous gradient
+            body.style.backgroundColor = ''; // Clear any previous bg color
 
             if (dominantTypes.length === 1) {
                 const type = dominantTypes[0];
                 const desc = resultDescriptions[type];
+                
+                body.classList.add(desc.colorClasses.pageBg); // Apply solid color class
+
                 html = `
                     <div class="my-6">
                         <p class="text-5xl font-extrabold ${desc.colorClasses.text}">${type}</p>
@@ -273,7 +294,19 @@
                     <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุด ${highestScore} คะแนน</p>
                 `;
                  mainResultBox.className = `result-box border-4 ring-4 ring-offset-4 ${desc.colorClasses.ring} ${desc.colorClasses.border} p-6 sm:p-8 rounded-xl shadow-2xl bg-white`;
-            } else {
+            
+            } else { // --- This block now handles all ties ---
+                
+                // --- NEW: Handle 2-way ties with a gradient ---
+                if (dominantTypes.length === 2) {
+                    const color1 = resultDescriptions[dominantTypes[0]].colorValue;
+                    const color2 = resultDescriptions[dominantTypes[1]].colorValue;
+                    body.style.backgroundImage = `linear-gradient(to right, ${color1}, ${color2})`;
+                } else {
+                    // Fallback for 3 or 4-way ties
+                    body.classList.add('bg-custom-neutral');
+                }
+
                 const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t} (${resultDescriptions[t].title.split(' - ')[1]})</span>`).join(' และ ');
                 const descriptions = dominantTypes.map(t => resultDescriptions[t].description).join(' ');
 
@@ -290,15 +323,25 @@
             resultDiv.innerHTML = html;
         }
 
+        // --- MODIFIED: Function now resets inline styles as well ---
         function resetApp() {
-            // Re-render questions to scramble choices for the new session.
+            const body = document.body;
+            
+            // Reset classes
+            const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
+            body.classList.remove(...allPageBgClasses);
+            
+            // --- NEW: Reset inline styles for gradients ---
+            body.style.backgroundImage = '';
+            body.style.backgroundColor = '';
+            
             renderQuestions();
             updateProgress(0);
             instructionsScreen.classList.remove('hidden');
             quizScreen.classList.add('hidden');
             resultsScreen.classList.add('hidden');
             calculateButton.textContent = 'ประมวลผลลัพธ์';
-            calculateButton.disabled = true; // Re-disable the button
+            calculateButton.disabled = true;
             appContainer.scrollIntoView({ behavior: 'smooth' });
         }
         
