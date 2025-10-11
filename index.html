@@ -269,7 +269,7 @@
         // --- Helper Functions ---
 
         /** Function to create and inject floating circles */
-        function createFloatingCircles(count = 25) {
+        function createFloatingCircles(count = 35) {
             const types = ['D', 'I', 'S', 'C'];
             floatingContainer.innerHTML = ''; // Clear existing circles
 
@@ -277,12 +277,12 @@
                 const circle = document.createElement('div');
                 const randomType = types[Math.floor(Math.random() * types.length)];
                 
-                // Random size (30px to 80px)
-                const size = Math.floor(Math.random() * 50) + 30;
+                // Random size (60px to 130px)
+                const size = Math.floor(Math.random() * 70) + 60;
                 
                 // Random position (allows them to start off-screen)
-                const startX = Math.floor(Math.random() * 120) - 10; // -10% to 110%
-                const startY = Math.floor(Math.random() * 120) - 10; // -10% to 110%
+                const startX = Math.floor(Math.random() * 120) + 10; // 10% to 130%
+                const startY = Math.floor(Math.random() * 120) + 10; // 10% to 130%
 
                 // CSS Variables for random animation
                 const randX = Math.floor(Math.random() * 400) - 200; // -200 to 200 for drift distance
@@ -581,7 +581,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderQuestions();
             calculateButton.disabled = false; 
-            createFloatingCircles(25); // Create 25 circles on page load
+            createFloatingCircles(35); // Create 25 circles on page load
         });
 
     </script>
