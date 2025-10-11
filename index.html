@@ -17,7 +17,56 @@
             background-color: #f7f9fb;
             color: #1f2937;
             transition: background-color 0.5s ease, background-image 0.5s ease; /* For smooth color change */
+            /* Ensure body is positioned correctly for the floating container */
+            position: relative; 
+            min-height: 100vh;
         }
+        
+        /* === FLOATING OBJECT STYLES === */
+        #floating-background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Crucial: Allows clicking through to the content */
+            overflow: hidden;
+            z-index: -1; /* Ensures it is always behind the main content */
+            opacity: 0.3; /* Subtle effect */
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.8;
+            filter: blur(2px); /* Soften the edges */
+            animation: float 20s infinite ease-in-out alternate;
+            /* Animation delay and duration will be set by JavaScript for randomness */
+        }
+
+        /* DISC Color Classes for Circles (using the OKLCH values for consistency) */
+        .circle-d { background-color: oklch(71.2% 0.194 13.428); }
+        .circle-i { background-color: oklch(87.9% 0.169 91.605); }
+        .circle-s { background-color: oklch(87.1% 0.15 154.449); }
+        .circle-c { background-color: oklch(70.7% 0.165 254.624); }
+
+        /* The core floating animation */
+        @keyframes float {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translate(calc(var(--randX) * 1px), calc(var(--randY) * 1px)) scale(var(--randScale)); 
+                opacity: 0.5;
+            }
+            100% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.8;
+            }
+        }
+        /* === END FLOATING OBJECT STYLES === */
+
         /* Custom CSS classes for OKLCH background colors */
         .bg-custom-d { background-color: oklch(71.2% 0.194 13.428); }
         .bg-custom-i { background-color: oklch(87.9% 0.169 91.605); }
@@ -53,9 +102,30 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Class for highlighting unanswered questions */
+        .question-block.unanswered {
+            border: 3px solid #ef4444 !important; /* Tailwind red-500 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        /* === NEW: Shaking animation for the progress bar === */
+        @keyframes shake-bar {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        #progress-container.error-shake {
+            animation: shake-bar 0.6s ease-in-out;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
+
+    <div id="floating-background-container"></div>
 
     <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-10 border border-gray-200">
 
@@ -99,10 +169,10 @@
 
             <div id="message-box" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg mt-8" role="alert">
                 <p class="font-bold">กรุณาตอบทุกข้อ</p>
-                <p class="text-sm">คุณยังไม่ได้ตอบคำถามครบทั้ง 20 ข้อ</p>
+                <p id="unanswered-count-message" class="text-sm">คุณยังมีคำถามที่ไม่ได้ตอบ</p>
             </div>
 
-            <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg">
                 ประมวลผลลัพธ์
             </button>
         </div>
@@ -153,7 +223,7 @@
             { id: 20, statements: [{ type: 'D', text: 'ฉันกล้าเสี่ยง' }, { type: 'I', text: 'ฉันชอบงานที่ไม่น่าเบื่อ' }, { type: 'S', text: 'ฉันจริงใจ' }, { type: 'C', text: 'ฉันชอบงานที่ชัดเจน' }] }
         ];
 
-        // --- MODIFIED: Added raw colorValue for creating gradients ---
+        // --- Data for Results ---
         const resultDescriptions = {
             D: {
                 title: "D - Dominance (ความเป็นผู้นำ)",
@@ -180,6 +250,57 @@
                 colorValue: "oklch(70.7% 0.165 254.624)"
             }
         };
+        
+        // --- NEW: Data for all tie-breaker scenarios ---
+        const tieDescriptions = {
+            // Two-way ties (keys are sorted alphabetically)
+            'DI': {
+                title: "D & I: ผู้นำจอมสร้างแรงบันดาลใจ",
+                description: "คุณเป็นคนที่มีพลังงานล้นเหลือและกระตือรือร้นสูง สามารถเป็นผู้นำที่เด็ดขาดและมุ่งมั่นสู่ความสำเร็จ ในขณะเดียวกันก็มีเสน่ห์ ชอบเข้าสังคม และสามารถสร้างแรงบันดาลใจให้คนรอบข้างได้อย่างยอดเยี่ยม คุณจึงเป็นผู้นำที่ทั้งสั่งการได้อย่างเฉียบขาดและซื้อใจคนเก่ง กล้าตัดสินใจและพร้อมที่จะนำเสนอไอเดียใหม่ๆ อยู่เสมอ"
+            },
+            'DS': {
+                title: "D & S: ผู้นำที่มั่นคงและน่าเชื่อถือ",
+                description: "คุณมีความเป็นผู้นำที่แน่วแน่และมุ่งมั่น แต่ในขณะเดียวกันก็มีความใจเย็น อดทน และเห็นอกเห็นใจผู้อื่น ทำให้คุณเป็นผู้นำที่น่าเคารพและไว้วางใจ สามารถตัดสินใจได้อย่างเด็ดขาด แต่ก็ยังรับฟังและให้การสนับสนุนทีมได้อย่างสม่ำเสมอ เป็นคนที่ปกป้องทีมและสร้างสภาพแวดล้อมการทำงานที่มั่นคง"
+            },
+            'CD': {
+                title: "D & C: ผู้นำเชิงกลยุทธ์",
+                description: "คุณคือผู้นำที่เน้นผลลัพธ์และความถูกต้องแม่นยำ มีความมุ่งมั่นและเด็ดขาดในการตัดสินใจ ผสมผสานกับความสามารถในการวางแผนอย่างเป็นระบบและใส่ใจในรายละเอียด คุณชอบความท้าทายที่ต้องใช้การวิเคราะห์และข้อมูลเพื่อหาทางออกที่ดีที่สุด และจะผลักดันให้ทุกอย่างสำเร็จตามมาตรฐานที่สูงลิ่ว"
+            },
+            'IS': {
+                title: "I & S: ผู้ประสานงานที่เป็นมิตร",
+                description: "คุณเป็นคนน่ารัก มีเสน่ห์ ชอบเข้าสังคม และยังเป็นผู้ฟังที่ดี มีความเห็นอกเห็นใจ และให้การสนับสนุนผู้อื่นเสมอ คุณจึงเป็นศูนย์กลางของความสัมพันธ์ที่ดี สามารถสร้างบรรยากาศที่อบอุ่นและเป็นกันเอง ทำให้ใครๆ ก็อยากเข้าหาและไว้วางใจ ไม่ชอบความขัดแย้งและพยายามอย่างยิ่งที่จะให้ทุกคนทำงานร่วมกันอย่างมีความสุข"
+            },
+            'CI': {
+                title: "I & C: นักสื่อสารที่เปี่ยมด้วยคุณภาพ",
+                description: "คุณมีความคิดสร้างสรรค์และชอบนำเสนอไอเดียใหม่ๆ แต่ในขณะเดียวกันก็ให้ความสำคัญกับความถูกต้องและข้อมูลที่เชื่อถือได้ คุณจึงเป็นนักสื่อสารที่ยอดเยี่ยม สามารถพูดเรื่องที่ซับซ้อนให้เข้าใจง่ายและน่าสนใจโดยไม่ทิ้งหลักการและความเป็นจริง มีความสามารถในการโน้มน้าวใจคนด้วยข้อมูลที่ผ่านการไตร่ตรองมาอย่างดี"
+            },
+            'CS': {
+                title: "S & C: ผู้ปฏิบัติงานที่วางใจได้",
+                description: "คุณเป็นคนที่สงบ สุขุม มีความรับผิดชอบสูงและทำงานได้อย่างมีแบบแผน มีความอดทนและซื่อสัตย์ ควบคู่ไปกับความละเอียดรอบคอบและมีมาตรฐานในการทำงาน คุณคือคนที่ใครๆ ก็ไว้วางใจให้ทำงานสำคัญ เพราะคุณจะทำงานนั้นอย่างใจเย็น เป็นขั้นเป็นตอน และตรวจสอบจนแน่ใจว่าผลลัพธ์ออกมาสมบูรณ์แบบที่สุด"
+            },
+            // Three-way ties
+            'DIS': {
+                title: "D & I & S: ผู้นำที่เข้าถึงง่ายและเป็นที่รัก",
+                description: "คุณมีความสามารถในการเป็นผู้นำที่มุ่งมั่น มีมนุษยสัมพันธ์ที่ดีเยี่ยมและเข้ากับคนง่าย พร้อมทั้งยังมีความใจเย็นและพร้อมสนับสนุนทีม ทำให้คุณเป็นผู้นำที่คนในทีมทั้งเกรงใจและรักใคร่ สามารถผลักดันทีมไปข้างหน้า ขณะเดียวกันก็สร้างบรรยากาศที่อบอุ่นและมั่นคง"
+            },
+            'CDI': {
+                title: "D & I & C: ผู้นำที่มีวิสัยทัศน์และเฉียบคม",
+                description: "คุณคือผู้นำที่มีพลังในการขับเคลื่อนทีมไปสู่เป้าหมาย สามารถสื่อสารวิสัยทัศน์ได้อย่างน่าตื่นเต้น และยังวางแผนทุกอย่างอย่างมีตรรกะและใส่ใจในรายละเอียด คุณเป็นนักกลยุทธ์ที่ครบเครื่อง สามารถสร้างสรรค์ไอเดียใหม่ๆ และทำให้มันเกิดขึ้นจริงได้อย่างมีคุณภาพ"
+            },
+            'CDS': {
+                title: "D & S & C: ผู้นำที่สุขุมและแม่นยำ",
+                description: "คุณเป็นผู้นำที่น่าเชื่อถืออย่างยิ่ง มีความเด็ดขาดในการตัดสินใจ แต่ทำอย่างสุขุมรอบคอบและอดทน โดยอิงตามแผนงานและข้อมูลที่ผ่านการวิเคราะห์มาอย่างดี คุณไม่ชอบความเสี่ยงที่ไม่จำเป็นและจะนำทีมไปสู่ความสำเร็จที่ยั่งยืนผ่านกระบวนการทำงานที่เป็นระบบและมีมาตรฐานสูง"
+            },
+            'CIS': {
+                title: "I & S & C: เพื่อนร่วมงานในอุดมคติ",
+                description: "คุณเป็นคนที่ใครๆ ก็อยากทำงานด้วย มีความสดใสและสร้างสรรค์ เป็นผู้ฟังที่ดีและพร้อมช่วยเหลือ และยังทำงานได้อย่างมีระเบียบและใส่ใจในคุณภาพ คุณสามารถประสานงานกับผู้อื่นได้อย่างราบรื่น สร้างบรรยากาศการทำงานที่ดี และยังส่งมอบงานที่มีคุณภาพสูงไปพร้อมๆ กัน"
+            },
+            // Four-way tie
+            'CDIS': {
+                title: "D & I & S & C: ผู้ที่ปรับตัวได้ในทุกสถานการณ์",
+                description: "คุณมีบุคลิกที่สมดุลและยืดหยุ่นอย่างยิ่ง สามารถปรับเปลี่ยนบทบาทของตัวเองได้ตามสถานการณ์ที่เผชิญ\nเมื่อต้องการ การตัดสินใจ คุณจะเด็ดขาดและมุ่งมั่น (D)\nเมื่อต้องการ การสื่อสาร คุณจะเปิดเผยและมีเสน่ห์ (I)\nเมื่อต้องการ ความร่วมมือ คุณจะอดทนและให้การสนับสนุน (S)\nเมื่อต้องการ คุณภาพ คุณจะละเอียดรอบคอบและเป็นระบบ (C)\nคุณเป็นคนที่มีความเข้าใจในมุมมองที่หลากหลาย สามารถทำงานได้ดีกับคนทุกประเภทและรับมือกับความท้าทายได้ทุกรูปแบบ ถือเป็นบุคลิกที่มีความสามารถรอบด้านอย่างแท้จริง"
+            }
+        };
 
         // --- DOM Elements ---
         const appContainer = document.getElementById('app');
@@ -193,10 +314,46 @@
         const messageBox = document.getElementById('message-box');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
-
+        const floatingContainer = document.getElementById('floating-background-container');
+        const progressContainer = document.getElementById('progress-container');
 
         // --- Helper Functions ---
 
+        /** Function to create and inject floating circles */
+        function createFloatingCircles(count = 35) {
+            const types = ['D', 'I', 'S', 'C'];
+            floatingContainer.innerHTML = ''; // Clear existing circles
+
+            for (let i = 0; i < count; i++) {
+                const circle = document.createElement('div');
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                
+                const size = Math.floor(Math.random() * 70) + 60;
+                const startX = Math.floor(Math.random() * 120) + 10;
+                const startY = Math.floor(Math.random() * 120) + 10;
+
+                const randX = Math.floor(Math.random() * 400) - 200;
+                const randY = Math.floor(Math.random() * 400) - 200;
+                const randScale = (Math.random() * 0.4) + 0.8;
+
+                circle.className = `floating-circle circle-${randomType.toLowerCase()}`;
+                
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${startX}vw`;
+                circle.style.top = `${startY}vh`;
+                
+                circle.style.animationDelay = `-${Math.random() * 20}s`;
+                circle.style.animationDuration = `${Math.random() * 10 + 20}s`;
+                
+                circle.style.setProperty('--randX', randX);
+                circle.style.setProperty('--randY', randY);
+                circle.style.setProperty('--randScale', randScale);
+
+                floatingContainer.appendChild(circle);
+            }
+        }
+        
         function renderQuestions() {
             discForm.innerHTML = QUESTIONS.map(q => {
                 const shuffledStatements = [...q.statements].sort(() => Math.random() - 0.5);
@@ -209,7 +366,7 @@
                     </div>
                 `).join('');
                 return `
-                    <div class="question-block border-b pb-8">
+                    <div class="question-block border-b pb-8" data-question-id="${q.id}">
                         <p class="text-xl font-semibold mb-4 text-gray-800">คำถามข้อที่ ${q.id}:</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             ${statementHtml}
@@ -232,18 +389,70 @@
             return { scores, answeredCount };
         }
 
+        function scrollToQuestion(element) {
+            const rect = element.getBoundingClientRect();
+            const targetPosition = window.pageYOffset + rect.top;
+            const offset = 80; 
+
+            window.scrollTo({
+                top: targetPosition - offset,
+                behavior: 'smooth'
+            });
+        }
+        
+        function shakeProgressBar() {
+            progressContainer.classList.remove('error-shake');
+            setTimeout(() => {
+                progressContainer.classList.add('error-shake');
+            }, 10);
+            
+            setTimeout(() => {
+                progressContainer.classList.remove('error-shake');
+            }, 500);
+        }
+
         function calculateResults() {
             const { scores, answeredCount } = calculateScores();
+            
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('unanswered');
+            });
+
             if (answeredCount < QUESTIONS.length) {
+                shakeProgressBar();
+                const remainingQuestions = QUESTIONS.length - answeredCount;
+                document.getElementById('unanswered-count-message').textContent = `คุณยังมีคำถามที่ไม่ได้ตอบอีก ${remainingQuestions} ข้อ`;
                 messageBox.classList.remove('hidden');
+                
+                let firstUnansweredQuestion = null;
+                
+                for (let i = 1; i <= QUESTIONS.length; i++) {
+                    const questionBlock = document.querySelector(`.question-block[data-question-id="${i}"]`);
+                    const isAnswered = discForm.querySelector(`input[name="q${i}"]:checked`);
+                    
+                    if (!isAnswered) {
+                        questionBlock.classList.add('unanswered');
+                        if (!firstUnansweredQuestion) {
+                            firstUnansweredQuestion = questionBlock;
+                        }
+                    }
+                }
+                
+                if (firstUnansweredQuestion) {
+                    scrollToQuestion(firstUnansweredQuestion);
+                }
+                
                 return;
             }
+            
             calculateButton.textContent = 'กำลังประมวลผล...';
-            calculateButton.disabled = true;
+            calculateButton.disabled = true; 
+            
             messageBox.classList.add('hidden');
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
             resultsScreen.scrollIntoView({ behavior: 'smooth' });
+            
             const scoreArray = Object.entries(scores);
             scoreArray.sort((a, b) => b[1] - a[1]);
             const highestScore = scoreArray[0][1];
@@ -265,25 +474,24 @@
                 `;
             }).join('');
         }
-
-        // --- MODIFIED: Function now handles gradients for 2-way ties ---
+        
+        // --- MODIFIED: Function updated to handle specific tie-breaker descriptions ---
         function renderDominantType(dominantTypes, highestScore) {
             const resultDiv = document.getElementById('dominant-type');
             const mainResultBox = document.getElementById('main-result');
             const body = document.body;
             let html = '';
             
-            // --- Reset all possible backgrounds first ---
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
             body.classList.remove(...allPageBgClasses);
-            body.style.backgroundImage = ''; // Clear any previous gradient
-            body.style.backgroundColor = ''; // Clear any previous bg color
+            body.style.backgroundImage = '';
+            body.style.backgroundColor = '';
 
             if (dominantTypes.length === 1) {
                 const type = dominantTypes[0];
                 const desc = resultDescriptions[type];
                 
-                body.classList.add(desc.colorClasses.pageBg); // Apply solid color class
+                body.classList.add(desc.colorClasses.pageBg);
 
                 html = `
                     <div class="my-6">
@@ -295,45 +503,54 @@
                 `;
                  mainResultBox.className = `result-box border-4 ring-4 ring-offset-4 ${desc.colorClasses.ring} ${desc.colorClasses.border} p-6 sm:p-8 rounded-xl shadow-2xl bg-white`;
             
-            } else { // --- This block now handles all ties ---
-                
-                // --- NEW: Handle 2-way ties with a gradient ---
+            } else { // This block handles all ties (2, 3, or 4 types)
+                const sortedTypes = dominantTypes.sort();
+                const tieKey = sortedTypes.join('');
+                const result = tieDescriptions[tieKey];
+
                 if (dominantTypes.length === 2) {
-                    const color1 = resultDescriptions[dominantTypes[0]].colorValue;
-                    const color2 = resultDescriptions[dominantTypes[1]].colorValue;
+                    const color1 = resultDescriptions[sortedTypes[0]].colorValue;
+                    const color2 = resultDescriptions[sortedTypes[1]].colorValue;
                     body.style.backgroundImage = `linear-gradient(to right, ${color1}, ${color2})`;
                 } else {
-                    // Fallback for 3 or 4-way ties
                     body.classList.add('bg-custom-neutral');
                 }
 
-                const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t} (${resultDescriptions[t].title.split(' - ')[1]})</span>`).join(' และ ');
-                const descriptions = dominantTypes.map(t => resultDescriptions[t].description).join(' ');
+                if (result) {
+                    html = `
+                        <div class="my-6">
+                            <p class="text-3xl font-extrabold text-gray-900">${result.title}</p>
+                        </div>
+                        <p class="text-xl text-gray-700 leading-loose" style="white-space: pre-line;">${result.description}</p>
+                        <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
+                    `;
+                } else {
+                    const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t}</span>`).join(' และ ');
+                    html = `
+                        <div class="my-6">
+                            <p class="text-3xl font-extrabold text-gray-900">บุคลิกภาพผสม</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-2">คุณมีลักษณะโดดเด่นในด้าน ${titles}</p>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
+                    `;
+                }
 
-                html = `
-                    <div class="my-6">
-                        <p class="text-3xl font-extrabold text-gray-900">บุคลิกภาพผสม</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-2">สไตล์ของคุณมีความโดดเด่นในด้าน ${titles}</p>
-                    </div>
-                    <p class="text-xl text-gray-700 leading-loose">บุคลิกภาพของคุณมีความยืดหยุ่นและมีลักษณะเด่นจากหลายด้านผสมกัน: ${descriptions}</p>
-                    <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
-                `;
                 mainResultBox.className = 'result-box border-4 ring-4 ring-offset-4 ring-gray-400 border-gray-500 p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
             }
             resultDiv.innerHTML = html;
         }
 
-        // --- MODIFIED: Function now resets inline styles as well ---
         function resetApp() {
             const body = document.body;
             
-            // Reset classes
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
             body.classList.remove(...allPageBgClasses);
-            
-            // --- NEW: Reset inline styles for gradients ---
             body.style.backgroundImage = '';
             body.style.backgroundColor = '';
+
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('unanswered');
+            });
             
             renderQuestions();
             updateProgress(0);
@@ -341,7 +558,7 @@
             quizScreen.classList.add('hidden');
             resultsScreen.classList.add('hidden');
             calculateButton.textContent = 'ประมวลผลลัพธ์';
-            calculateButton.disabled = true;
+            calculateButton.disabled = false; 
             appContainer.scrollIntoView({ behavior: 'smooth' });
         }
         
@@ -368,11 +585,20 @@
                 resetApp();
             }
         });
-
-        discForm.addEventListener('change', () => {
+        
+        discForm.addEventListener('change', (e) => {
+            if (e.target.type === 'radio') {
+                const questionName = e.target.name; 
+                const questionId = questionName.substring(1);
+                const questionBlock = document.querySelector(`.question-block[data-question-id="${questionId}"]`);
+                if (questionBlock) {
+                    questionBlock.classList.remove('unanswered');
+                }
+            }
+            
             const answeredCount = Array.from(discForm.elements).filter(el => el.checked).length;
-            calculateButton.disabled = answeredCount !== QUESTIONS.length;
             updateProgress(answeredCount);
+            
             if (answeredCount === QUESTIONS.length) {
                 messageBox.classList.add('hidden');
             }
@@ -381,7 +607,8 @@
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             renderQuestions();
-            calculateButton.disabled = true;
+            calculateButton.disabled = false; 
+            createFloatingCircles(35);
         });
 
     </script>
