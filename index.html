@@ -119,7 +119,7 @@
         }
 
         #progress-container.error-shake {
-            animation: shake-bar 0.4s ease-in-out;
+            animation: shake-bar 0.6s ease-in-out;
         }
     </style>
 </head>
@@ -169,7 +169,7 @@
 
             <div id="message-box" class="hidden bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg mt-8" role="alert">
                 <p class="font-bold">กรุณาตอบทุกข้อ</p>
-                <p class="text-sm">คุณยังไม่ได้ตอบคำถามครบทั้ง 20 ข้อ</p>
+                <p id="unanswered-count-message" class="text-sm">คุณยังมีคำถามที่ไม่ได้ตอบ</p>
             </div>
 
             <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg">
@@ -389,7 +389,9 @@
                 shakeProgressBar();
 
                 // 3. Display warning message
-                messageBox.classList.remove('hidden');
+            const remainingQuestions = QUESTIONS.length - answeredCount; // Add this line
+            document.getElementById('unanswered-count-message').textContent = `คุณยังมีคำถามที่ไม่ได้ตอบอีก ${remainingQuestions} ข้อ`; // Add this line
+            messageBox.classList.remove('hidden');
                 
                 let firstUnansweredQuestion = null;
                 
