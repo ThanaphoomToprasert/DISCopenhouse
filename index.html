@@ -250,6 +250,57 @@
                 colorValue: "oklch(70.7% 0.165 254.624)"
             }
         };
+        
+        // --- NEW: Data for all tie-breaker scenarios ---
+        const tieDescriptions = {
+            // Two-way ties (keys are sorted alphabetically)
+            'DI': {
+                title: "D & I: ผู้นำจอมสร้างแรงบันดาลใจ",
+                description: "คุณเป็นคนที่มีพลังงานล้นเหลือและกระตือรือร้นสูง สามารถเป็นผู้นำที่เด็ดขาดและมุ่งมั่นสู่ความสำเร็จ ในขณะเดียวกันก็มีเสน่ห์ ชอบเข้าสังคม และสามารถสร้างแรงบันดาลใจให้คนรอบข้างได้อย่างยอดเยี่ยม คุณจึงเป็นผู้นำที่ทั้งสั่งการได้อย่างเฉียบขาดและซื้อใจคนเก่ง กล้าตัดสินใจและพร้อมที่จะนำเสนอไอเดียใหม่ๆ อยู่เสมอ"
+            },
+            'DS': {
+                title: "D & S: ผู้นำที่มั่นคงและน่าเชื่อถือ",
+                description: "คุณมีความเป็นผู้นำที่แน่วแน่และมุ่งมั่น แต่ในขณะเดียวกันก็มีความใจเย็น อดทน และเห็นอกเห็นใจผู้อื่น ทำให้คุณเป็นผู้นำที่น่าเคารพและไว้วางใจ สามารถตัดสินใจได้อย่างเด็ดขาด แต่ก็ยังรับฟังและให้การสนับสนุนทีมได้อย่างสม่ำเสมอ เป็นคนที่ปกป้องทีมและสร้างสภาพแวดล้อมการทำงานที่มั่นคง"
+            },
+            'CD': {
+                title: "D & C: ผู้นำเชิงกลยุทธ์",
+                description: "คุณคือผู้นำที่เน้นผลลัพธ์และความถูกต้องแม่นยำ มีความมุ่งมั่นและเด็ดขาดในการตัดสินใจ ผสมผสานกับความสามารถในการวางแผนอย่างเป็นระบบและใส่ใจในรายละเอียด คุณชอบความท้าทายที่ต้องใช้การวิเคราะห์และข้อมูลเพื่อหาทางออกที่ดีที่สุด และจะผลักดันให้ทุกอย่างสำเร็จตามมาตรฐานที่สูงลิ่ว"
+            },
+            'IS': {
+                title: "I & S: ผู้ประสานงานที่เป็นมิตร",
+                description: "คุณเป็นคนน่ารัก มีเสน่ห์ ชอบเข้าสังคม และยังเป็นผู้ฟังที่ดี มีความเห็นอกเห็นใจ และให้การสนับสนุนผู้อื่นเสมอ คุณจึงเป็นศูนย์กลางของความสัมพันธ์ที่ดี สามารถสร้างบรรยากาศที่อบอุ่นและเป็นกันเอง ทำให้ใครๆ ก็อยากเข้าหาและไว้วางใจ ไม่ชอบความขัดแย้งและพยายามอย่างยิ่งที่จะให้ทุกคนทำงานร่วมกันอย่างมีความสุข"
+            },
+            'CI': {
+                title: "I & C: นักสื่อสารที่เปี่ยมด้วยคุณภาพ",
+                description: "คุณมีความคิดสร้างสรรค์และชอบนำเสนอไอเดียใหม่ๆ แต่ในขณะเดียวกันก็ให้ความสำคัญกับความถูกต้องและข้อมูลที่เชื่อถือได้ คุณจึงเป็นนักสื่อสารที่ยอดเยี่ยม สามารถพูดเรื่องที่ซับซ้อนให้เข้าใจง่ายและน่าสนใจโดยไม่ทิ้งหลักการและความเป็นจริง มีความสามารถในการโน้มน้าวใจคนด้วยข้อมูลที่ผ่านการไตร่ตรองมาอย่างดี"
+            },
+            'CS': {
+                title: "S & C: ผู้ปฏิบัติงานที่วางใจได้",
+                description: "คุณเป็นคนที่สงบ สุขุม มีความรับผิดชอบสูงและทำงานได้อย่างมีแบบแผน มีความอดทนและซื่อสัตย์ ควบคู่ไปกับความละเอียดรอบคอบและมีมาตรฐานในการทำงาน คุณคือคนที่ใครๆ ก็ไว้วางใจให้ทำงานสำคัญ เพราะคุณจะทำงานนั้นอย่างใจเย็น เป็นขั้นเป็นตอน และตรวจสอบจนแน่ใจว่าผลลัพธ์ออกมาสมบูรณ์แบบที่สุด"
+            },
+            // Three-way ties
+            'DIS': {
+                title: "D & I & S: ผู้นำที่เข้าถึงง่ายและเป็นที่รัก",
+                description: "คุณมีความสามารถในการเป็นผู้นำที่มุ่งมั่น มีมนุษยสัมพันธ์ที่ดีเยี่ยมและเข้ากับคนง่าย พร้อมทั้งยังมีความใจเย็นและพร้อมสนับสนุนทีม ทำให้คุณเป็นผู้นำที่คนในทีมทั้งเกรงใจและรักใคร่ สามารถผลักดันทีมไปข้างหน้า ขณะเดียวกันก็สร้างบรรยากาศที่อบอุ่นและมั่นคง"
+            },
+            'CDI': {
+                title: "D & I & C: ผู้นำที่มีวิสัยทัศน์และเฉียบคม",
+                description: "คุณคือผู้นำที่มีพลังในการขับเคลื่อนทีมไปสู่เป้าหมาย สามารถสื่อสารวิสัยทัศน์ได้อย่างน่าตื่นเต้น และยังวางแผนทุกอย่างอย่างมีตรรกะและใส่ใจในรายละเอียด คุณเป็นนักกลยุทธ์ที่ครบเครื่อง สามารถสร้างสรรค์ไอเดียใหม่ๆ และทำให้มันเกิดขึ้นจริงได้อย่างมีคุณภาพ"
+            },
+            'CDS': {
+                title: "D & S & C: ผู้นำที่สุขุมและแม่นยำ",
+                description: "คุณเป็นผู้นำที่น่าเชื่อถืออย่างยิ่ง มีความเด็ดขาดในการตัดสินใจ แต่ทำอย่างสุขุมรอบคอบและอดทน โดยอิงตามแผนงานและข้อมูลที่ผ่านการวิเคราะห์มาอย่างดี คุณไม่ชอบความเสี่ยงที่ไม่จำเป็นและจะนำทีมไปสู่ความสำเร็จที่ยั่งยืนผ่านกระบวนการทำงานที่เป็นระบบและมีมาตรฐานสูง"
+            },
+            'CIS': {
+                title: "I & S & C: เพื่อนร่วมงานในอุดมคติ",
+                description: "คุณเป็นคนที่ใครๆ ก็อยากทำงานด้วย มีความสดใสและสร้างสรรค์ เป็นผู้ฟังที่ดีและพร้อมช่วยเหลือ และยังทำงานได้อย่างมีระเบียบและใส่ใจในคุณภาพ คุณสามารถประสานงานกับผู้อื่นได้อย่างราบรื่น สร้างบรรยากาศการทำงานที่ดี และยังส่งมอบงานที่มีคุณภาพสูงไปพร้อมๆ กัน"
+            },
+            // Four-way tie
+            'CDIS': {
+                title: "D & I & S & C: ผู้ที่ปรับตัวได้ในทุกสถานการณ์",
+                description: "คุณมีบุคลิกที่สมดุลและยืดหยุ่นอย่างยิ่ง สามารถปรับเปลี่ยนบทบาทของตัวเองได้ตามสถานการณ์ที่เผชิญ\nเมื่อต้องการ การตัดสินใจ คุณจะเด็ดขาดและมุ่งมั่น (D)\nเมื่อต้องการ การสื่อสาร คุณจะเปิดเผยและมีเสน่ห์ (I)\nเมื่อต้องการ ความร่วมมือ คุณจะอดทนและให้การสนับสนุน (S)\nเมื่อต้องการ คุณภาพ คุณจะละเอียดรอบคอบและเป็นระบบ (C)\nคุณเป็นคนที่มีความเข้าใจในมุมมองที่หลากหลาย สามารถทำงานได้ดีกับคนทุกประเภทและรับมือกับความท้าทายได้ทุกรูปแบบ ถือเป็นบุคลิกที่มีความสามารถรอบด้านอย่างแท้จริง"
+            }
+        };
 
         // --- DOM Elements ---
         const appContainer = document.getElementById('app');
@@ -264,7 +315,7 @@
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const floatingContainer = document.getElementById('floating-background-container');
-        const progressContainer = document.getElementById('progress-container'); // NEW
+        const progressContainer = document.getElementById('progress-container');
 
         // --- Helper Functions ---
 
@@ -277,31 +328,24 @@
                 const circle = document.createElement('div');
                 const randomType = types[Math.floor(Math.random() * types.length)];
                 
-                // Random size (60px to 130px)
                 const size = Math.floor(Math.random() * 70) + 60;
-                
-                // Random position (allows them to start off-screen)
-                const startX = Math.floor(Math.random() * 120) + 10; // 10% to 130%
-                const startY = Math.floor(Math.random() * 120) + 10; // 10% to 130%
+                const startX = Math.floor(Math.random() * 120) + 10;
+                const startY = Math.floor(Math.random() * 120) + 10;
 
-                // CSS Variables for random animation
-                const randX = Math.floor(Math.random() * 400) - 200; // -200 to 200 for drift distance
+                const randX = Math.floor(Math.random() * 400) - 200;
                 const randY = Math.floor(Math.random() * 400) - 200;
-                const randScale = (Math.random() * 0.4) + 0.8; // 0.8 to 1.2 for gentle pulse
+                const randScale = (Math.random() * 0.4) + 0.8;
 
                 circle.className = `floating-circle circle-${randomType.toLowerCase()}`;
                 
-                // Apply inline styles for size and initial position
                 circle.style.width = `${size}px`;
                 circle.style.height = `${size}px`;
                 circle.style.left = `${startX}vw`;
                 circle.style.top = `${startY}vh`;
                 
-                // Apply inline styles for animation randomness
-                circle.style.animationDelay = `-${Math.random() * 20}s`; // Negative delay starts animation mid-cycle
-                circle.style.animationDuration = `${Math.random() * 10 + 20}s`; // 20s to 30s duration
+                circle.style.animationDelay = `-${Math.random() * 20}s`;
+                circle.style.animationDuration = `${Math.random() * 10 + 20}s`;
                 
-                // Set CSS variables for the float keyframes
                 circle.style.setProperty('--randX', randX);
                 circle.style.setProperty('--randY', randY);
                 circle.style.setProperty('--randScale', randScale);
@@ -312,7 +356,6 @@
         
         function renderQuestions() {
             discForm.innerHTML = QUESTIONS.map(q => {
-                // IMPORTANT: Add data-question-id attribute for easy selection
                 const shuffledStatements = [...q.statements].sort(() => Math.random() - 0.5);
                 const statementHtml = shuffledStatements.map((s, index) => `
                     <div class="flex items-center">
@@ -346,13 +389,9 @@
             return { scores, answeredCount };
         }
 
-        // --- NEW: Function to handle the custom scroll ---
         function scrollToQuestion(element) {
-            // Get the bounding rectangle of the element
             const rect = element.getBoundingClientRect();
-            // Calculate the position relative to the document
             const targetPosition = window.pageYOffset + rect.top;
-            // Define the offset (adjust this value as needed, 60px should clear the sticky header)
             const offset = 80; 
 
             window.scrollTo({
@@ -361,48 +400,37 @@
             });
         }
         
-        // --- NEW: Function to shake the progress bar and then remove the class ---
         function shakeProgressBar() {
-            progressContainer.classList.remove('error-shake'); // Reset animation
-            // Use setTimeout to ensure the class is removed before adding it again for a clean shake
+            progressContainer.classList.remove('error-shake');
             setTimeout(() => {
                 progressContainer.classList.add('error-shake');
             }, 10);
             
-            // Remove the shake class after the animation duration (0.4s)
             setTimeout(() => {
                 progressContainer.classList.remove('error-shake');
             }, 500);
         }
 
-
         function calculateResults() {
             const { scores, answeredCount } = calculateScores();
             
-            // 1. Remove previous error highlights
             document.querySelectorAll('.question-block').forEach(block => {
                 block.classList.remove('unanswered');
             });
 
             if (answeredCount < QUESTIONS.length) {
-                // 2. NEW: Trigger the shake animation
                 shakeProgressBar();
-
-                // 3. Display warning message
-            const remainingQuestions = QUESTIONS.length - answeredCount; // Add this line
-            document.getElementById('unanswered-count-message').textContent = `คุณยังมีคำถามที่ไม่ได้ตอบอีก ${remainingQuestions} ข้อ`; // Add this line
-            messageBox.classList.remove('hidden');
+                const remainingQuestions = QUESTIONS.length - answeredCount;
+                document.getElementById('unanswered-count-message').textContent = `คุณยังมีคำถามที่ไม่ได้ตอบอีก ${remainingQuestions} ข้อ`;
+                messageBox.classList.remove('hidden');
                 
                 let firstUnansweredQuestion = null;
                 
-                // 4. Find and highlight unanswered questions
                 for (let i = 1; i <= QUESTIONS.length; i++) {
                     const questionBlock = document.querySelector(`.question-block[data-question-id="${i}"]`);
-                    // Check if any radio button for this question is checked
                     const isAnswered = discForm.querySelector(`input[name="q${i}"]:checked`);
                     
                     if (!isAnswered) {
-                        // Apply the red border highlight
                         questionBlock.classList.add('unanswered');
                         if (!firstUnansweredQuestion) {
                             firstUnansweredQuestion = questionBlock;
@@ -410,16 +438,13 @@
                     }
                 }
                 
-                // 5. NEW: Use the custom scroll function to ensure visibility
                 if (firstUnansweredQuestion) {
                     scrollToQuestion(firstUnansweredQuestion);
                 }
                 
-                return; // Stop processing results
+                return;
             }
             
-            // If all answered, proceed to results
-            // Temporarily disable the button during processing to prevent double-click
             calculateButton.textContent = 'กำลังประมวลผล...';
             calculateButton.disabled = true; 
             
@@ -449,24 +474,24 @@
                 `;
             }).join('');
         }
-
+        
+        // --- MODIFIED: Function updated to handle specific tie-breaker descriptions ---
         function renderDominantType(dominantTypes, highestScore) {
             const resultDiv = document.getElementById('dominant-type');
             const mainResultBox = document.getElementById('main-result');
             const body = document.body;
             let html = '';
             
-            // --- Reset all possible backgrounds first ---
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
             body.classList.remove(...allPageBgClasses);
-            body.style.backgroundImage = ''; // Clear any previous gradient
-            body.style.backgroundColor = ''; // Clear any previous bg color
+            body.style.backgroundImage = '';
+            body.style.backgroundColor = '';
 
             if (dominantTypes.length === 1) {
                 const type = dominantTypes[0];
                 const desc = resultDescriptions[type];
                 
-                body.classList.add(desc.colorClasses.pageBg); // Apply solid color class
+                body.classList.add(desc.colorClasses.pageBg);
 
                 html = `
                     <div class="my-6">
@@ -478,45 +503,51 @@
                 `;
                  mainResultBox.className = `result-box border-4 ring-4 ring-offset-4 ${desc.colorClasses.ring} ${desc.colorClasses.border} p-6 sm:p-8 rounded-xl shadow-2xl bg-white`;
             
-            } else { // --- This block now handles all ties ---
-                
-                // --- Handle 2-way ties with a gradient ---
+            } else { // This block handles all ties (2, 3, or 4 types)
+                const sortedTypes = dominantTypes.sort();
+                const tieKey = sortedTypes.join('');
+                const result = tieDescriptions[tieKey];
+
                 if (dominantTypes.length === 2) {
-                    const color1 = resultDescriptions[dominantTypes[0]].colorValue;
-                    const color2 = resultDescriptions[dominantTypes[1]].colorValue;
+                    const color1 = resultDescriptions[sortedTypes[0]].colorValue;
+                    const color2 = resultDescriptions[sortedTypes[1]].colorValue;
                     body.style.backgroundImage = `linear-gradient(to right, ${color1}, ${color2})`;
                 } else {
-                    // Fallback for 3 or 4-way ties
                     body.classList.add('bg-custom-neutral');
                 }
 
-                const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t} (${resultDescriptions[t].title.split(' - ')[1]})</span>`).join(' และ ');
-                const descriptions = dominantTypes.map(t => resultDescriptions[t].description).join(' ');
+                if (result) {
+                    html = `
+                        <div class="my-6">
+                            <p class="text-3xl font-extrabold text-gray-900">${result.title}</p>
+                        </div>
+                        <p class="text-xl text-gray-700 leading-loose" style="white-space: pre-line;">${result.description}</p>
+                        <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
+                    `;
+                } else {
+                    const titles = dominantTypes.map(t => `<span class="${resultDescriptions[t].colorClasses.text} font-extrabold">${t}</span>`).join(' และ ');
+                    html = `
+                        <div class="my-6">
+                            <p class="text-3xl font-extrabold text-gray-900">บุคลิกภาพผสม</p>
+                            <p class="text-2xl font-bold text-gray-800 mt-2">คุณมีลักษณะโดดเด่นในด้าน ${titles}</p>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
+                    `;
+                }
 
-                html = `
-                    <div class="my-6">
-                        <p class="text-3xl font-extrabold text-gray-900">บุคลิกภาพผสม</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-2">สไตล์ของคุณมีความโดดเด่นในด้าน ${titles}</p>
-                    </div>
-                    <p class="text-xl text-gray-700 leading-loose">บุคลิกภาพของคุณมีความยืดหยุ่นและมีลักษณะเด่นจากหลายด้านผสมกัน: ${descriptions}</p>
-                    <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
-                `;
                 mainResultBox.className = 'result-box border-4 ring-4 ring-offset-4 ring-gray-400 border-gray-500 p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
             }
             resultDiv.innerHTML = html;
         }
 
-        // --- Resets the app state ---
         function resetApp() {
             const body = document.body;
             
-            // Reset background styles
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
             body.classList.remove(...allPageBgClasses);
             body.style.backgroundImage = '';
             body.style.backgroundColor = '';
 
-            // Remove error highlights
             document.querySelectorAll('.question-block').forEach(block => {
                 block.classList.remove('unanswered');
             });
@@ -544,7 +575,6 @@
             discForm.querySelector('input[type="radio"]').focus();
         });
 
-        // The button click triggers validation
         calculateButton.addEventListener('click', (e) => {
             e.preventDefault();
             calculateResults();
@@ -556,14 +586,12 @@
             }
         });
         
-        // Listener to update progress and clear highlights when a question is answered
         discForm.addEventListener('change', (e) => {
             if (e.target.type === 'radio') {
                 const questionName = e.target.name; 
                 const questionId = questionName.substring(1);
                 const questionBlock = document.querySelector(`.question-block[data-question-id="${questionId}"]`);
                 if (questionBlock) {
-                    // Clear the red border when answered
                     questionBlock.classList.remove('unanswered');
                 }
             }
@@ -571,7 +599,6 @@
             const answeredCount = Array.from(discForm.elements).filter(el => el.checked).length;
             updateProgress(answeredCount);
             
-            // If all are answered, hide the warning box if it was visible
             if (answeredCount === QUESTIONS.length) {
                 messageBox.classList.add('hidden');
             }
@@ -581,7 +608,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderQuestions();
             calculateButton.disabled = false; 
-            createFloatingCircles(35); // Create 25 circles on page load
+            createFloatingCircles(35);
         });
 
     </script>
