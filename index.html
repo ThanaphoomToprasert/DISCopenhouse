@@ -17,7 +17,56 @@
             background-color: #f7f9fb;
             color: #1f2937;
             transition: background-color 0.5s ease, background-image 0.5s ease; /* For smooth color change */
+            /* Ensure body is positioned correctly for the floating container */
+            position: relative; 
+            min-height: 100vh;
         }
+        
+        /* === FLOATING OBJECT STYLES === */
+        #floating-background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Crucial: Allows clicking through to the content */
+            overflow: hidden;
+            z-index: -1; /* Ensures it is always behind the main content */
+            opacity: 0.3; /* Subtle effect */
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.8;
+            filter: blur(2px); /* Soften the edges */
+            animation: float 20s infinite ease-in-out alternate;
+            /* Animation delay and duration will be set by JavaScript for randomness */
+        }
+
+        /* DISC Color Classes for Circles (using the OKLCH values for consistency) */
+        .circle-d { background-color: oklch(71.2% 0.194 13.428); }
+        .circle-i { background-color: oklch(87.9% 0.169 91.605); }
+        .circle-s { background-color: oklch(87.1% 0.15 154.449); }
+        .circle-c { background-color: oklch(70.7% 0.165 254.624); }
+
+        /* The core floating animation */
+        @keyframes float {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translate(calc(var(--randX) * 1px), calc(var(--randY) * 1px)) scale(var(--randScale)); 
+                opacity: 0.5;
+            }
+            100% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.8;
+            }
+        }
+        /* === END FLOATING OBJECT STYLES === */
+
         /* Custom CSS classes for OKLCH background colors */
         .bg-custom-d { background-color: oklch(71.2% 0.194 13.428); }
         .bg-custom-i { background-color: oklch(87.9% 0.169 91.605); }
@@ -53,9 +102,30 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Class for highlighting unanswered questions */
+        .question-block.unanswered {
+            border: 3px solid #ef4444 !important; /* Tailwind red-500 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        /* === NEW: Shaking animation for the progress bar === */
+        @keyframes shake-bar {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        #progress-container.error-shake {
+            animation: shake-bar 0.4s ease-in-out;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
+
+    <div id="floating-background-container"></div>
 
     <div id="app" class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 sm:p-10 border border-gray-200">
 
@@ -102,7 +172,7 @@
                 <p class="text-sm">คุณยังไม่ได้ตอบคำถามครบทั้ง 20 ข้อ</p>
             </div>
 
-            <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed">
+            <button id="calculate-button" class="mt-8 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition duration-200 shadow-lg">
                 ประมวลผลลัพธ์
             </button>
         </div>
@@ -153,7 +223,7 @@
             { id: 20, statements: [{ type: 'D', text: 'ฉันชอบงานที่ไม่น่าเบื่อ' }, { type: 'I', text: 'ฉันสนุกสนาน' }, { type: 'S', text: 'ฉันวางตัวเหมาะสมกับกาลเทศะ' }, { type: 'C', text: 'ฉันจริงใจ' }] }
         ];
 
-        // --- MODIFIED: Added raw colorValue for creating gradients ---
+        // --- Data for Results ---
         const resultDescriptions = {
             D: {
                 title: "D - Dominance (ความเป็นผู้นำ)",
@@ -193,12 +263,56 @@
         const messageBox = document.getElementById('message-box');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
-
+        const floatingContainer = document.getElementById('floating-background-container');
+        const progressContainer = document.getElementById('progress-container'); // NEW
 
         // --- Helper Functions ---
 
+        /** Function to create and inject floating circles */
+        function createFloatingCircles(count = 25) {
+            const types = ['D', 'I', 'S', 'C'];
+            floatingContainer.innerHTML = ''; // Clear existing circles
+
+            for (let i = 0; i < count; i++) {
+                const circle = document.createElement('div');
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                
+                // Random size (30px to 80px)
+                const size = Math.floor(Math.random() * 50) + 30;
+                
+                // Random position (allows them to start off-screen)
+                const startX = Math.floor(Math.random() * 120) - 10; // -10% to 110%
+                const startY = Math.floor(Math.random() * 120) - 10; // -10% to 110%
+
+                // CSS Variables for random animation
+                const randX = Math.floor(Math.random() * 400) - 200; // -200 to 200 for drift distance
+                const randY = Math.floor(Math.random() * 400) - 200;
+                const randScale = (Math.random() * 0.4) + 0.8; // 0.8 to 1.2 for gentle pulse
+
+                circle.className = `floating-circle circle-${randomType.toLowerCase()}`;
+                
+                // Apply inline styles for size and initial position
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.left = `${startX}vw`;
+                circle.style.top = `${startY}vh`;
+                
+                // Apply inline styles for animation randomness
+                circle.style.animationDelay = `-${Math.random() * 20}s`; // Negative delay starts animation mid-cycle
+                circle.style.animationDuration = `${Math.random() * 10 + 20}s`; // 20s to 30s duration
+                
+                // Set CSS variables for the float keyframes
+                circle.style.setProperty('--randX', randX);
+                circle.style.setProperty('--randY', randY);
+                circle.style.setProperty('--randScale', randScale);
+
+                floatingContainer.appendChild(circle);
+            }
+        }
+        
         function renderQuestions() {
             discForm.innerHTML = QUESTIONS.map(q => {
+                // IMPORTANT: Add data-question-id attribute for easy selection
                 const shuffledStatements = [...q.statements].sort(() => Math.random() - 0.5);
                 const statementHtml = shuffledStatements.map((s, index) => `
                     <div class="flex items-center">
@@ -209,7 +323,7 @@
                     </div>
                 `).join('');
                 return `
-                    <div class="question-block border-b pb-8">
+                    <div class="question-block border-b pb-8" data-question-id="${q.id}">
                         <p class="text-xl font-semibold mb-4 text-gray-800">คำถามข้อที่ ${q.id}:</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             ${statementHtml}
@@ -232,18 +346,86 @@
             return { scores, answeredCount };
         }
 
+        // --- NEW: Function to handle the custom scroll ---
+        function scrollToQuestion(element) {
+            // Get the bounding rectangle of the element
+            const rect = element.getBoundingClientRect();
+            // Calculate the position relative to the document
+            const targetPosition = window.pageYOffset + rect.top;
+            // Define the offset (adjust this value as needed, 60px should clear the sticky header)
+            const offset = 80; 
+
+            window.scrollTo({
+                top: targetPosition - offset,
+                behavior: 'smooth'
+            });
+        }
+        
+        // --- NEW: Function to shake the progress bar and then remove the class ---
+        function shakeProgressBar() {
+            progressContainer.classList.remove('error-shake'); // Reset animation
+            // Use setTimeout to ensure the class is removed before adding it again for a clean shake
+            setTimeout(() => {
+                progressContainer.classList.add('error-shake');
+            }, 10);
+            
+            // Remove the shake class after the animation duration (0.4s)
+            setTimeout(() => {
+                progressContainer.classList.remove('error-shake');
+            }, 500);
+        }
+
+
         function calculateResults() {
             const { scores, answeredCount } = calculateScores();
+            
+            // 1. Remove previous error highlights
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('unanswered');
+            });
+
             if (answeredCount < QUESTIONS.length) {
+                // 2. NEW: Trigger the shake animation
+                shakeProgressBar();
+
+                // 3. Display warning message
                 messageBox.classList.remove('hidden');
-                return;
+                
+                let firstUnansweredQuestion = null;
+                
+                // 4. Find and highlight unanswered questions
+                for (let i = 1; i <= QUESTIONS.length; i++) {
+                    const questionBlock = document.querySelector(`.question-block[data-question-id="${i}"]`);
+                    // Check if any radio button for this question is checked
+                    const isAnswered = discForm.querySelector(`input[name="q${i}"]:checked`);
+                    
+                    if (!isAnswered) {
+                        // Apply the red border highlight
+                        questionBlock.classList.add('unanswered');
+                        if (!firstUnansweredQuestion) {
+                            firstUnansweredQuestion = questionBlock;
+                        }
+                    }
+                }
+                
+                // 5. NEW: Use the custom scroll function to ensure visibility
+                if (firstUnansweredQuestion) {
+                    scrollToQuestion(firstUnansweredQuestion);
+                }
+                
+                return; // Stop processing results
             }
+            
+            // If all answered, proceed to results
+            // Temporarily disable the button during processing to prevent double-click
             calculateButton.textContent = 'กำลังประมวลผล...';
-            calculateButton.disabled = true;
+            calculateButton.disabled = true; 
+            
             messageBox.classList.add('hidden');
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
             resultsScreen.scrollIntoView({ behavior: 'smooth' });
+            
             const scoreArray = Object.entries(scores);
             scoreArray.sort((a, b) => b[1] - a[1]);
             const highestScore = scoreArray[0][1];
@@ -266,7 +448,6 @@
             }).join('');
         }
 
-        // --- MODIFIED: Function now handles gradients for 2-way ties ---
         function renderDominantType(dominantTypes, highestScore) {
             const resultDiv = document.getElementById('dominant-type');
             const mainResultBox = document.getElementById('main-result');
@@ -297,7 +478,7 @@
             
             } else { // --- This block now handles all ties ---
                 
-                // --- NEW: Handle 2-way ties with a gradient ---
+                // --- Handle 2-way ties with a gradient ---
                 if (dominantTypes.length === 2) {
                     const color1 = resultDescriptions[dominantTypes[0]].colorValue;
                     const color2 = resultDescriptions[dominantTypes[1]].colorValue;
@@ -323,17 +504,20 @@
             resultDiv.innerHTML = html;
         }
 
-        // --- MODIFIED: Function now resets inline styles as well ---
+        // --- Resets the app state ---
         function resetApp() {
             const body = document.body;
             
-            // Reset classes
+            // Reset background styles
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
             body.classList.remove(...allPageBgClasses);
-            
-            // --- NEW: Reset inline styles for gradients ---
             body.style.backgroundImage = '';
             body.style.backgroundColor = '';
+
+            // Remove error highlights
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('unanswered');
+            });
             
             renderQuestions();
             updateProgress(0);
@@ -341,7 +525,7 @@
             quizScreen.classList.add('hidden');
             resultsScreen.classList.add('hidden');
             calculateButton.textContent = 'ประมวลผลลัพธ์';
-            calculateButton.disabled = true;
+            calculateButton.disabled = false; 
             appContainer.scrollIntoView({ behavior: 'smooth' });
         }
         
@@ -358,6 +542,7 @@
             discForm.querySelector('input[type="radio"]').focus();
         });
 
+        // The button click triggers validation
         calculateButton.addEventListener('click', (e) => {
             e.preventDefault();
             calculateResults();
@@ -368,11 +553,23 @@
                 resetApp();
             }
         });
-
-        discForm.addEventListener('change', () => {
+        
+        // Listener to update progress and clear highlights when a question is answered
+        discForm.addEventListener('change', (e) => {
+            if (e.target.type === 'radio') {
+                const questionName = e.target.name; 
+                const questionId = questionName.substring(1);
+                const questionBlock = document.querySelector(`.question-block[data-question-id="${questionId}"]`);
+                if (questionBlock) {
+                    // Clear the red border when answered
+                    questionBlock.classList.remove('unanswered');
+                }
+            }
+            
             const answeredCount = Array.from(discForm.elements).filter(el => el.checked).length;
-            calculateButton.disabled = answeredCount !== QUESTIONS.length;
             updateProgress(answeredCount);
+            
+            // If all are answered, hide the warning box if it was visible
             if (answeredCount === QUESTIONS.length) {
                 messageBox.classList.add('hidden');
             }
@@ -381,7 +578,8 @@
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             renderQuestions();
-            calculateButton.disabled = true;
+            calculateButton.disabled = false; 
+            createFloatingCircles(25); // Create 25 circles on page load
         });
 
     </script>
