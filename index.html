@@ -490,6 +490,22 @@
             body.classList.remove(...allPageBgClasses);
             body.style.backgroundImage = ''; 
 
+        function renderDominantType(dominantTypes, highestScore) {
+            const resultDiv = document.getElementById('dominant-type');
+            const mainResultBox = document.getElementById('main-result');
+            const body = document.body;
+            let html = '';
+            
+            const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
+            
+            // Reset background styles
+            body.classList.remove(...allPageBgClasses);
+            body.style.backgroundImage = ''; 
+
+            // --- NEW: Reset custom border styles at the start of every render ---
+            mainResultBox.style.borderImage = '';
+            mainResultBox.style.borderColor = '';
+
             if (dominantTypes.length === 1) {
                 const type = dominantTypes[0];
                 const desc = resultDescriptions[type];
@@ -515,8 +531,17 @@
                     const color1 = resultDescriptions[sortedTypes[0]].colorValue;
                     const color2 = resultDescriptions[sortedTypes[1]].colorValue;
                     body.style.backgroundImage = `linear-gradient(to right, ${color1}, ${color2})`;
+
+                    // --- NEW: Apply gradient border for 2-way ties ---
+                    mainResultBox.className = 'result-box border-4 border-solid p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
+                    mainResultBox.style.borderColor = 'transparent'; // Hide the base border color
+                    mainResultBox.style.borderImage = `linear-gradient(to right, ${color1}, ${color2}) 1`;
+
                 } else {
                     body.classList.add('bg-custom-neutral');
+                    
+                    // --- CHANGED: Use the default gray border for 3+ way ties ---
+                    mainResultBox.className = 'result-box border-4 ring-4 ring-offset-4 ring-gray-400 border-gray-500 p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
                 }
 
                 if (result) {
@@ -537,8 +562,6 @@
                         <p class="mt-4 text-sm text-gray-500">ได้คะแนนสูงสุดเท่ากันที่ ${highestScore} คะแนน</p>
                     `;
                 }
-
-                mainResultBox.className = 'result-box border-4 ring-4 ring-offset-4 ring-gray-400 border-gray-500 p-6 sm:p-8 rounded-xl shadow-2xl bg-white';
             }
             resultDiv.innerHTML = html;
         }
