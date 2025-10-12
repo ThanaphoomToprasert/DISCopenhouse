@@ -483,9 +483,12 @@
             let html = '';
             
             const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
+            
+            // --- FIX ---
+            // The fix is here: We reset the classes and the inline background image,
+            // but we no longer reset the inline background color, as it's not needed.
             body.classList.remove(...allPageBgClasses);
-            body.style.backgroundImage = '';
-            body.style.backgroundColor = '';
+            body.style.backgroundImage = ''; 
 
             if (dominantTypes.length === 1) {
                 const type = dominantTypes[0];
