@@ -475,21 +475,9 @@
             }).join('');
         }
         
-        // --- MODIFIED: Function updated to handle specific tie-breaker descriptions ---
-        function renderDominantType(dominantTypes, highestScore) {
-            const resultDiv = document.getElementById('dominant-type');
-            const mainResultBox = document.getElementById('main-result');
-            const body = document.body;
-            let html = '';
-            
-            const allPageBgClasses = ['bg-custom-d', 'bg-custom-i', 'bg-custom-s', 'bg-custom-c', 'bg-custom-neutral'];
-            
-            // --- FIX ---
-            // The fix is here: We reset the classes and the inline background image,
-            // but we no longer reset the inline background color, as it's not needed.
-            body.classList.remove(...allPageBgClasses);
-            body.style.backgroundImage = ''; 
+// ... (previous code)
 
+        // --- MODIFIED: Function updated to handle specific tie-breaker descriptions ---
         function renderDominantType(dominantTypes, highestScore) {
             const resultDiv = document.getElementById('dominant-type');
             const mainResultBox = document.getElementById('main-result');
@@ -507,6 +495,7 @@
             mainResultBox.style.borderColor = '';
 
             if (dominantTypes.length === 1) {
+                // ... (rest of the function implementation)
                 const type = dominantTypes[0];
                 const desc = resultDescriptions[type];
                 
